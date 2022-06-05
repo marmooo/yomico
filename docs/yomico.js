@@ -3,6 +3,7 @@ function yomico(url) {
   function textNodesUnder(node) {
     let all = [];
     for (node = node.firstChild; node; node = node.nextSibling) {
+      if (node.tagName == "TEMPLATE") node = node.content;
       if (node.nodeType == 3) all.push(node);
       else all = all.concat(textNodesUnder(node));
     }
@@ -11,7 +12,7 @@ function yomico(url) {
 
   function applyAll(yomis, tagFilter) {
     let target = textNodesUnder(document);
-    if (tagFilter) target = target.filter(x => tagFilter(x));
+    if (tagFilter) target = target.filter((x) => tagFilter(x));
     target.forEach((e) => {
       yomis = apply(e, yomis);
     });
