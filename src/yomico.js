@@ -12,16 +12,23 @@ function kanaToHira(str) {
   });
 }
 
-function getYomi(morpheme) {
+function getYomis(morpheme) {
   const surface = morpheme.surface;
-  const reading = morpheme.reading;
-  const regexp = /^([ぁ-んァ-ヴ]*)[一-龠々ヵヶ]+([ぁ-んァ-ヴ]*)$/;
-  const matched = surface.match(regexp);
-  const pos1 = matched[1].length;
-  const pos2 = matched[2].length;
-  const kanji = surface.slice(pos1, surface.length - pos2);
-  const yomi = reading.slice(pos1, reading.length - pos2);
-  return [kanji, kanaToHira(yomi)];
+  const reading = kanaToHira(morpheme.reading);
+  const arr = surface.match(/([ぁ-んァ-ヴー]+|[一-龠々ヵヶ]+)/g);
+  if (arr.length == 1) return [[surface, reading]];
+
+  const targets = arr.map((x) => {
+    return (/[ぁ-んァ-ヴー]/.test(x)) ? false : true;
+  });
+  const pattern = arr.map((x) => {
+    return (/[ぁ-んァ-ヴー]/.test(x)) ? `(${x})` : "(.+)";
+  }).join("");
+  const matched = reading.match(new RegExp(pattern));
+  const result = matched.slice(1)
+    .map((x, i) => [arr[i], x])
+    .filter((_, i) => targets[i]);
+  return result;
 }
 
 async function build(text, outputPath) {
@@ -31,8 +38,10 @@ async function build(text, outputPath) {
   const kanjiRegexp = /^[一-龠々ヵヶ]/;
   for (const morpheme of parsed) {
     if (!kanjiRegexp.test(morpheme.surface)) continue;
-    const [kanji, yomi] = getYomi(morpheme);
-    result.push(`${kanji},${yomi}`);
+    getYomis(morpheme).forEach((data) => {
+      const [kanji, yomi] = data;
+      result.push(`${kanji},${yomi}`);
+    });
   }
   Deno.writeTextFileSync(outputPath, result.join("\n"));
 }
