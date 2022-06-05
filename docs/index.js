@@ -19,7 +19,7 @@ loadConfig();
 document.getElementById("toggleDarkMode").onclick = toggleDarkMode;
 document.getElementById("yomico").addEventListener("click", (e) => {
   import("./yomico.min.js").then((module) => {
-    module.yomico(location.href + "index.yomi");
+    module.yomico("/yomico/index.yomi");
   });
   e.target.disabled = true;
 }, { once: true });

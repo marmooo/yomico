@@ -23,7 +23,7 @@ yomico index.html  # --> index.yomi
 ```
 document.getElementById("yomico").addEventListener("click", () => {
   import("./yomico.js").then((module) => {
-    module.yomico(location.href + "index.yomi");
+    module.yomico("/yomico/index.yomi");
   });
   e.target.disabled = true;
 }, { once: true });
