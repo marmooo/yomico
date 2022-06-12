@@ -2,6 +2,18 @@
 
 半手動でふりがなのルビを振るためのライブラリです。
 
+## Prerequisites
+
+- [Mecab](https://taku910.github.io/mecab/)
+- Mecab Dictionary (mecab-ipadic, mecab-unidic, etc.)
+
+apt を利用すれば以下でインストールできます。
+
+```
+sudo apt install mecab mecab-ipadic-utf8
+```
+
+
 ## Installation
 
 ```
