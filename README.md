@@ -17,7 +17,7 @@ sudo apt install mecab mecab-ipadic-utf8
 ## Installation
 
 ```
-deno install --allow-read --allow-write --allow-run \
+deno install -fr --allow-read --allow-write --allow-run \
 https://raw.githubusercontent.com/marmooo/yomico/main/src/yomico.js
 ```
 
