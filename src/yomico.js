@@ -1,4 +1,4 @@
-import * as path from "https://deno.land/std/path/mod.ts";
+import { SEP } from "https://deno.land/std/path/mod.ts";
 import { expandGlobSync } from "https://deno.land/std/fs/expand_glob.ts";
 import { extname } from "https://deno.land/std/path/mod.ts";
 import { parse } from "https://esm.sh/node-html-parser@6.1.5";
@@ -87,11 +87,10 @@ async function build(text, outputPath) {
 }
 
 function globHtml(dir, recursive) {
-  const s = path.sep;
   if (recursive) {
-    return expandGlobSync(`${dir}${s}**${s}*.htm?(l)`);
+    return expandGlobSync(`${dir}${SEP}**${SEP}*.htm?(l)`);
   } else {
-    return expandGlobSync(`${dir}${s}*.htm?(l)`);
+    return expandGlobSync(`${dir}${SEP}*.htm?(l)`);
   }
 }
 
