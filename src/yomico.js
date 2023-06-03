@@ -1,9 +1,44 @@
 import * as path from "https://deno.land/std/path/mod.ts";
 import { expandGlobSync } from "https://deno.land/std/fs/expand_glob.ts";
 import { extname } from "https://deno.land/std/path/mod.ts";
+import { parse } from "https://esm.sh/node-html-parser@6.1.5";
 import Denomander from "https://deno.land/x/denomander/mod.ts";
-import MeCab from "https://deno.land/x/deno_mecab/mod.ts";
-import { parse } from "https://esm.sh/node-html-parser";
+import $ from "https://deno.land/x/dax/mod.ts";
+
+const batchSize = 1000;
+
+// https://github.com/sera1mu/deno_mecab
+// deno_mecab style Mecab + IPADic parser, but 30x faster
+async function parseMecab(filepath) {
+  const result = [];
+  const stdout = await $`mecab ${filepath}`.text();
+  stdout.slice(0, -4).split("\nEOS\n").forEach((sentence) => {
+    const morphemes = [];
+    sentence.replace(/\t/g, ",").split("\n").forEach((line) => {
+      const cols = line.split(",");
+      const morpheme = {
+        surface: cols[0],
+        feature: cols[1],
+        featureDetails: [cols[2], cols[3], cols[4]],
+        conjugationForms: [cols[5], cols[6]],
+        originalForm: cols[7],
+        reading: cols[8],
+        pronunciation: cols[9],
+      };
+      morphemes.push(morpheme);
+    });
+    result.push(morphemes);
+  });
+  return result;
+}
+
+async function parseText(text) {
+  const tmpfileName = await Deno.makeTempFile();
+  await Deno.writeTextFile(tmpfileName, text);
+  const result = await parseMecab(tmpfileName);
+  Deno.remove(tmpfileName);
+  return result;
+}
 
 function kanaToHira(str) {
   return str.replace(/[\u30a1-\u30f6]/g, function (match) {
@@ -32,16 +67,21 @@ function getYomis(morpheme) {
 }
 
 async function build(text, outputPath) {
-  const mecab = new MeCab(["mecab"]);
-  const parsed = await mecab.parse(text);
   const result = [];
+  const sentences = text.replace(/^\s*[\r\n]/gm, "").split("\n");
   const kanjiRegexp = /^[一-龠々ヵヶ]/;
-  for (const morpheme of parsed) {
-    if (!kanjiRegexp.test(morpheme.surface)) continue;
-    getYomis(morpheme).forEach((data) => {
-      const [kanji, yomi] = data;
-      result.push(`${kanji},${yomi}`);
-    });
+  for (let i = 0; i < sentences.length; i += batchSize) {
+    const batchSentences = sentences.slice(i, i + batchSize);
+    const parsed = await parseText(batchSentences.join("\n"));
+    for (const morphemes of parsed) {
+      for (const morpheme of morphemes) {
+        if (!kanjiRegexp.test(morpheme.surface)) continue;
+        getYomis(morpheme).forEach((data) => {
+          const [kanji, yomi] = data;
+          result.push(`${kanji},${yomi}`);
+        });
+      }
+    }
   }
   Deno.writeTextFileSync(outputPath, result.join("\n"));
 }
