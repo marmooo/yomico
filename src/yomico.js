@@ -1,4 +1,4 @@
-import { SEP, extname } from "https://deno.land/std/path/mod.ts";
+import { extname, SEP } from "https://deno.land/std/path/mod.ts";
 import { expandGlobSync } from "https://deno.land/std/fs/expand_glob.ts";
 import { parse } from "https://esm.sh/node-html-parser@6.1.5";
 import Denomander from "https://deno.land/x/denomander/mod.ts";
