@@ -41,7 +41,7 @@ async function parseText(text) {
 }
 
 function kanaToHira(str) {
-  return str.replace(/[\u30a1-\u30f6]/g, function (match) {
+  return str.replace(/[ァ-ヶ]/g, (match) => {
     const chr = match.charCodeAt(0) - 0x60;
     return String.fromCharCode(chr);
   });
@@ -50,14 +50,14 @@ function kanaToHira(str) {
 function getYomis(morpheme) {
   const surface = morpheme.surface;
   const reading = kanaToHira(morpheme.reading);
-  const arr = surface.match(/([ぁ-んァ-ヴー]+|[一-龠々ヵヶ]+)/g);
+  const arr = surface.match(/([ぁ-ヴァ-ヴー]+|[\u4E00-\u9FFF々ヵヶ]+)/g);
   if (arr.length == 1) return [[surface, reading]];
 
   const targets = arr.map((x) => {
-    return (/[ぁ-んァ-ヴー]/.test(x)) ? false : true;
+    return (/[ぁ-ゔァ-ヴー]/.test(x)) ? false : true;
   });
   const pattern = arr.map((x) => {
-    return (/[ぁ-んァ-ヴー]/.test(x)) ? `(${x})` : "(.+)";
+    return (/[ぁ-ゔァ-ヴー]/.test(x)) ? `(${x})` : "(.+)";
   }).join("");
   const matched = reading.match(new RegExp(pattern));
   const result = matched.slice(1)
@@ -69,7 +69,7 @@ function getYomis(morpheme) {
 async function build(text, outputPath) {
   const result = [];
   const sentences = text.replace(/^\s*[\r\n]/gm, "").split("\n");
-  const kanjiRegexp = /^[一-龠々ヵヶ]/;
+  const kanjiRegexp = /^[\u4E00-\u9FFF々ヵヶ]/;
   for (let i = 0; i < sentences.length; i += batchSize) {
     const batchSentences = sentences.slice(i, i + batchSize);
     const parsed = await parseText(batchSentences.join("\n"));
