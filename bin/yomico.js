@@ -3,7 +3,7 @@ import { SEPARATOR } from "https://deno.land/std/path/constants.ts";
 import { expandGlobSync } from "https://deno.land/std/fs/expand_glob.ts";
 import { parse } from "https://esm.sh/node-html-parser@6.1.12";
 import Denomander from "https://deno.land/x/denomander@0.9.3/mod.ts";
-import $ from "https://deno.land/x/dax/mod.ts";
+import { $ } from "npm:zx@7.2.3";
 
 const batchSize = 1000;
 
@@ -11,8 +11,8 @@ const batchSize = 1000;
 // deno_mecab style Mecab + IPADic parser, but 30x faster
 async function parseMecab(filepath) {
   const result = [];
-  const stdout = await $`mecab ${filepath}`.text();
-  stdout.slice(0, -4).split("\nEOS\n").forEach((sentence) => {
+  const parsed = await $`mecab ${filepath}`.quiet();
+  parsed.stdout.slice(0, -4).split("\nEOS\n").forEach((sentence) => {
     const morphemes = [];
     sentence.replace(/\t/g, ",").split("\n").forEach((line) => {
       const cols = line.split(",");
