@@ -1,6 +1,5 @@
-import { extname } from "https://deno.land/std/path/mod.ts";
-import { SEPARATOR } from "https://deno.land/std/path/constants.ts";
-import { expandGlobSync } from "https://deno.land/std/fs/expand_glob.ts";
+import { extname, SEPARATOR } from "jsr:@std/path";
+import { expandGlobSync } from "jsr:@std/fs";
 import { parse } from "npm:node-html-parser@6.1.13";
 import Denomander from "https://deno.land/x/denomander@0.9.3/mod.ts";
 import { $ } from "npm:zx@8.1.9";
