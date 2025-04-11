@@ -1,6 +1,6 @@
 import { extname, SEPARATOR } from "jsr:@std/path";
 import { expandGlobSync } from "jsr:@std/fs";
-import { parse } from "npm:node-html-parser@6.1.13";
+import { parse } from "npm:node-html-parser@7.0.1";
 import { Command } from "npm:commander@13.1.0";
 import { $ } from "npm:zx@8.5.2-lite";
 
