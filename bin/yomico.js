@@ -1,7 +1,7 @@
 import { extname, SEPARATOR } from "jsr:@std/path";
 import { expandGlobSync } from "jsr:@std/fs";
 import { parse } from "npm:node-html-parser@6.1.13";
-import Denomander from "https://deno.land/x/denomander@0.9.3/mod.ts";
+import { Command } from "npm:commander@13.1.0";
 import { $ } from "npm:zx@8.1.9";
 
 const batchSize = 1000;
@@ -100,21 +100,21 @@ function getYomiPath(path) {
   return basePath + ".yomi";
 }
 
-const program = new Denomander({
-  app_name: "Yomico",
-  app_description: "半手動でふりがなのルビを振るためのライブラリです。",
-  app_version: "0.0.1",
-});
-
+const program = new Command();
 program
-  .defaultCommand("[input]")
-  .argDescription("input", "Path of HTML file/directory")
-  .option("-r, --recursive", "Recursively inline directories")
-  .parse(Deno.args);
+  .name("Yomico")
+  .description("半手動でふりがなのルビを振るためのライブラリです。")
+  .version("0.0.1");
+program
+  .argument("<input>", "Path of HTML file/directory")
+  .option("-r, --recursive", "Recursively inline directories");
+program.parse();
 
-if (Deno.statSync(program.input).isFile) {
-  const outputPath = getYomiPath(program.input);
-  const html = Deno.readTextFileSync(program.input);
+const filePath = program.args[0];
+
+if (Deno.statSync(filePath).isFile) {
+  const outputPath = getYomiPath(filePath);
+  const html = Deno.readTextFileSync(filePath);
   const root = parse(html);
   const text = root.innerText;
   build(text, outputPath);
