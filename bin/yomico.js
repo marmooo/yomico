@@ -2,7 +2,7 @@
 import { extname, SEPARATOR } from "jsr:@std/path@1";
 import { expandGlobSync } from "jsr:@std/fs@1";
 import { parse } from "npm:node-html-parser@9.0.4";
-import { Command } from "npm:commander@13.1.0";
+import { Command } from "npm:commander@15.0.0";
 import { $ } from "npm:zx@8.5.5-lite";
 
 const batchSize = 1000;
